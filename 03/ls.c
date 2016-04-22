@@ -7,9 +7,14 @@ ls - show directory content
 #include <stdio.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <sys/stat.h>
+#include <string.h>
+
 
 void do_ls(char []);
-void mode_to_letters(int, char []);
+void dostat(char *);
+void show_file_info(char *, struct stat *);
+void mode_to_string(int, char []);
 
 int main (int argc, char *argv[])
 
@@ -34,12 +39,35 @@ void do_ls (char dirname[])
   else
     {
       while ((direntp = readdir(dir_ptr))!=NULL)
-        printf("%s\n", direntp->d_name );
+        dostat(direntp->d_name);
     }
   closedir(dir_ptr);
 }
 
-void mode_to_letter(int mode, char str[])
+void dostat(char *filename)
+{
+    struct stat info;
+    if (stat(filename, &info) == -1)
+      perror(filename);
+    else
+      show_file_info(filename, &info);
+}
+
+void show_file_info(char *fname, struct stat *info_p)
+{
+  char modestr[11];
+  mode_to_string(info_p->st_mode, modestr);
+  printf ("%s ", modestr );
+  printf ("links: %d ", info_p->st_nlink);
+  printf ("user: %d ", info_p->st_uid);
+  printf ("group: %d ", info_p->st_gid);
+  printf ("size: %lld ", info_p->st_size);
+  printf ("modtime: %ld ", info_p->st_mtime);
+  printf ("name: %s\n", fname);
+}
+
+
+void mode_to_string(int mode, char str[])
 {
   strcpy (str,"----------");
   if (S_ISDIR(mode)) str[0]='d';
