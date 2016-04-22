@@ -10,6 +10,8 @@ ls - show directory content
 #include <sys/stat.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
+
 
 void do_ls(char []);
 void dostat(char *);
@@ -22,6 +24,34 @@ char *gid_to_name(gid_t);
 int main (int argc, char *argv[])
 
 {
+  char ch;
+  int index;
+  int opt = 0;
+
+  while ((ch = getopt(argc, argv, "la:"))!=-1)
+  {
+    switch (ch)
+    {
+      case 'l': printf ("Full format activated");
+      case 'a': printf ("show all files");
+      default: printf ("Simple view");
+    }
+  }
+
+  for (index = optind; index < argc; index++)
+  {
+    opt = 1;
+    printf("%s\n", argv[index] );
+    do_ls(argv[index]);
+  }
+
+  if (opt == 0)
+  {
+    do_ls(".");
+  }
+
+
+/*
   if (argc == 1)
     do_ls(".");
   else
@@ -30,6 +60,7 @@ int main (int argc, char *argv[])
       printf("%s\n", *++argv );
       do_ls(*argv);
     }
+*/
 
 }
 
