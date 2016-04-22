@@ -9,7 +9,7 @@ ls - show directory content
 #include <dirent.h>
 #include <sys/stat.h>
 #include <string.h>
-
+#include <time.h>
 
 void do_ls(char []);
 void dostat(char *);
@@ -64,9 +64,9 @@ void show_file_info(char *fname, struct stat *info_p)
   printf ("%4d ", (int)info_p->st_nlink);
   printf ("%-8s ", uid_to_name(info_p->st_uid));
   printf ("%-8s ", gid_to_name(info_p->st_gid));
-  printf ("size: %lld ", info_p->st_size);
-  printf ("modtime: %ld ", info_p->st_mtime);
-  printf ("name: %s\n", fname);
+  printf ("%8ld ", (long)info_p->st_size);
+  printf ("%.12s ", 4+ctime(&info_p->st_mtime));
+  printf ("%s\n", fname);
 }
 
 
