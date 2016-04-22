@@ -15,6 +15,9 @@ void do_ls(char []);
 void dostat(char *);
 void show_file_info(char *, struct stat *);
 void mode_to_string(int, char []);
+char *uid_to_name(uid_t);
+char *gid_to_name(gid_t);
+
 
 int main (int argc, char *argv[])
 
@@ -58,9 +61,9 @@ void show_file_info(char *fname, struct stat *info_p)
   char modestr[11];
   mode_to_string(info_p->st_mode, modestr);
   printf ("%s ", modestr );
-  printf ("links: %d ", info_p->st_nlink);
-  printf ("user: %d ", info_p->st_uid);
-  printf ("group: %d ", info_p->st_gid);
+  printf ("%4d ", (int)info_p->st_nlink);
+  printf ("%-8s ", uid_to_name(info_p->st_uid));
+  printf ("%-8s ", gid_to_name(info_p->st_gid));
   printf ("size: %lld ", info_p->st_size);
   printf ("modtime: %ld ", info_p->st_mtime);
   printf ("name: %s\n", fname);
@@ -82,4 +85,36 @@ void mode_to_string(int mode, char str[])
   if (mode & S_IROTH) str[7] = 'r';
   if (mode & S_IWOTH) str[8] = 'w';
   if (mode & S_IXOTH) str[9] = 'x';
+}
+
+#include <pwd.h>
+char *uid_to_name(uid_t uid)
+{
+  struct passwd *getpwuid();
+  struct passwd *pw_ptr;
+  static char numstr[10];
+
+  if(( pw_ptr = getpwuid(uid)) == NULL)
+  {
+    sprintf(numstr, "% d", uid);
+    return numstr;
+  }
+  else
+    return pw_ptr->pw_name;
+}
+
+#include <grp.h>
+char *gid_to_name(uid_t gid)
+{
+  struct group *getgrgid();
+  struct group *grp_ptr;
+  static char numstr[10];
+
+  if(( grp_ptr = getgrgid(gid)) == NULL)
+  {
+    sprintf(numstr, "% d", gid);
+    return numstr;
+  }
+  else
+    return grp_ptr->gr_name;
 }
