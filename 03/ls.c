@@ -12,6 +12,7 @@ ls - show directory content
 #include <time.h>
 #include <unistd.h>
 
+#define PAGEWIDTH 25
 
 void do_ls(char []);
 void simple_ls(char *);
@@ -20,7 +21,11 @@ void show_file_info(char *, struct stat *);
 void mode_to_string(int, char []);
 char *uid_to_name(uid_t);
 char *gid_to_name(gid_t);
+int filenameLen(const char*);
 
+
+int showFull = 0;
+int showHidden = 0;
 
 int main (int argc, char *argv[])
 
@@ -69,10 +74,12 @@ void simple_ls(char dirname[])
   else
     {
       while ((direntp = readdir(dir_ptr))!=NULL)
-        printf ("%s\n",direntp->d_name);
+        printf ("%s \t",direntp->d_name);
     }
+      printf("\n");
   closedir(dir_ptr);
 }
+
 
 
 void do_ls (char dirname[])
@@ -159,4 +166,12 @@ char *gid_to_name(uid_t gid)
   }
   else
     return grp_ptr->gr_name;
+}
+
+
+int filenameLen(const char* str)
+{
+    int size = 0;
+    while(*str++) ++size;
+    return size;
 }
