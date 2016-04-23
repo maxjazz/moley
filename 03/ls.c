@@ -14,6 +14,7 @@ ls - show directory content
 
 
 void do_ls(char []);
+void simple_ls(char *);
 void dostat(char *);
 void show_file_info(char *, struct stat *);
 void mode_to_string(int, char []);
@@ -27,14 +28,15 @@ int main (int argc, char *argv[])
   char ch;
   int index;
   int opt = 0;
+  int showFull = 0;
+  int showHidden = 0;
 
-  while ((ch = getopt(argc, argv, "la:"))!=-1)
+  while ((ch = getopt(argc, argv, "la"))!=-1)
   {
     switch (ch)
     {
-      case 'l': printf ("Full format activated");
-      case 'a': printf ("show all files");
-      default: printf ("Simple view");
+      case 'l': showFull=1; break;
+      case 'a': showHidden=1; break;
     }
   }
 
@@ -42,27 +44,36 @@ int main (int argc, char *argv[])
   {
     opt = 1;
     printf("%s\n", argv[index] );
-    do_ls(argv[index]);
+    if (showFull == 1)
+      do_ls(argv[index]);
+    else
+      simple_ls(argv[index]);
   }
 
   if (opt == 0)
   {
-    do_ls(".");
+    if (showFull == 1)
+      do_ls(".");
+    else
+      simple_ls(".");
   }
 
-
-/*
-  if (argc == 1)
-    do_ls(".");
-  else
-    while (--argc)
-    {
-      printf("%s\n", *++argv );
-      do_ls(*argv);
-    }
-*/
-
 }
+
+void simple_ls(char dirname[])
+{
+  DIR *dir_ptr;
+  struct dirent *direntp;
+  if ((dir_ptr = opendir (dirname))==NULL)
+    fprintf(stderr, "ls: cannot open %s\n", dirname);
+  else
+    {
+      while ((direntp = readdir(dir_ptr))!=NULL)
+        printf ("%s\n",direntp->d_name);
+    }
+  closedir(dir_ptr);
+}
+
 
 void do_ls (char dirname[])
 {
