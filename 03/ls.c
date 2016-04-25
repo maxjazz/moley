@@ -28,6 +28,7 @@ int filenameLen(const char*);
 
 int showFull = 0;
 int showHidden = 0;
+int showRecursive = 0;
 
 int main (int argc, char *argv[])
 
@@ -35,15 +36,14 @@ int main (int argc, char *argv[])
   char ch;
   int index;
   int opt = 0;
-  int showFull = 0;
-  int showHidden = 0;
 
-  while ((ch = getopt(argc, argv, "la"))!=-1)
+  while ((ch = getopt(argc, argv, "lar"))!=-1)
   {
     switch (ch)
     {
       case 'l': showFull=1; break;
       case 'a': showHidden=1; break;
+      case 'r': showRecursive=1; break;
     }
   }
 
