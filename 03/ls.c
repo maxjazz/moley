@@ -107,6 +107,7 @@ void dostat(char *directory, char *filename)
     //strcat(fullfile, directory);
 
     strcpy(fullfile,directory);
+    strcat(fullfile, "/");
     strcat(fullfile,filename);
 
     if (stat(fullfile, &info) == -1)
