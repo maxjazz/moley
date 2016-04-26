@@ -15,6 +15,22 @@ ls - show directory content
 
 #define PAGEWIDTH 25
 
+struct filebuf
+{
+  char dir[256];
+  char name[256];
+  mode_t mode;
+  nlink_t nlink;
+  uid_t uid;
+  gid_t gid;
+  struct timespec mtime;
+  struct timespec atime;
+  struct timespec sctime;
+  struct timespec birthtime;
+  off_t size;
+};
+
+
 void do_ls(char []);
 void simple_ls(char *);
 void dostat(char *, char *);
