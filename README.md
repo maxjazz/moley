@@ -19,4 +19,5 @@
 - pwd.c
 
 # Глава 5 (Управление соединениями)
--  showtty.c
+- showtty.c
+- echostate.c
