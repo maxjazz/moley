@@ -30,9 +30,6 @@ int get_response (char *question)
       case 'n':
       case 'N':
       case EOF: return 1;
-      default:
-        printf("Cannot understand %c\n", input );
-        printf("Please, type y or n\n");
     }
   }
 
