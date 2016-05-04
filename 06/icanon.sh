@@ -1,3 +1,3 @@
 #!/bin/bash
 stty -icanon;
-./rotate
+./playagain
