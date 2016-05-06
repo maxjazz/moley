@@ -1,32 +1,45 @@
+/*
+Назначение - запросить, не желает ли пользователь выполнить транзакцию
+Метод - установить посимвольный режим терминала, no-echo, no-delay,
+        читать символ, возвратить значение результата
+        восстановить режимы терминала при SIGINT
+        проигнорировать поступление SIGQUIT
+*/
+
+
+
 #include <stdio.h>
 #include <ctype.h>
 #include <termios.h>
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
+#include <stdlib.h>
+
+
 
 #define ASK "Do you want another transaction"
 #define TRIES 3
 #define SLEEPTIME 2
 #define BEEP putchar('\a');
 
-
-#define QUESTION "Do you want another transaction?"
-
 int get_response(char *, int);
 void tty_mode(int);
-void set_crmode();
+void set_cr_noecho_mode();
 void set_nodelay_mode();
 int get_ok_char();
 
 int main(int argc, char* argv[])
 {
   int response;
+  void ctrl_c_handler();
   tty_mode(0);
-  set_crmode();
+  set_cr_noecho_mode();
   set_nodelay_mode();
-  response = get_response(QUESTION, TRIES
-  );
+  signal(SIGINT, ctrl_c_handler);
+  signal(SIGQUIT, SIG_IGN);
+  response = get_response(ASK, TRIES);
   tty_mode(1);
   return response;
 }
@@ -35,6 +48,7 @@ int get_response (char *question, int maxtries)
 {
   int input;
   printf("%s (y/n)\n", question );
+  fflush(stdout);
   while (1)
   {
     sleep(SLEEPTIME);
@@ -60,7 +74,7 @@ int get_ok_char()
 
 
 
-void set_crmode()
+void set_cr_noecho_mode()
 {
   struct termios ttystate;
   tcgetattr(0, &ttystate);
@@ -83,12 +97,22 @@ void tty_mode(int how)
 {
   static struct termios original_mode;
   static int original_flags;
+  static int stored = 1;
   if (how == 0)
   {
     tcgetattr(0, &original_mode);
     original_flags = fcntl(0,F_GETFL);
+    stored = 1;
   }
-  else
+  else if (stored)
+  {
     tcsetattr(0,TCSANOW, &original_mode);
     fcntl(0,F_SETFL, original_flags);
+  }
+}
+
+void ctrl_c_handler(int signum)
+{
+  tty_mode(1);
+  exit(1);
 }
